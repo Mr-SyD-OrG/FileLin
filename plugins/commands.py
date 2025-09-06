@@ -223,17 +223,18 @@ async def link(client, message):
 @Client.on_callback_query(filters.regex(r"checksyd"))
 async def check_subscription_callback(client, query):
     try:
-        file_id = query.data.split("#")[1]
-        user_id = query.from_user.id
         is_req_sub = await is_req_subscribed(client, query)
         is_sub = await is_subscribed(client, query)
         if not (is_req_sub and is_sub):
             await query.answer("Rᴇqᴜᴇꜱᴛ Tᴏ Jᴏɪɴ ɪɴ ᴏᴜʀ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ ᴍᴀʜɴ! ᴩʟᴇᴀꜱᴇ... 🥺", show_alert=True)
             return
 
+        file_id = query.data.split("#")[1]
+        user_id = query.from_user.id
         doc = await client.get_messages(LOG_CHANNEL, int(file_id))
         file_name = doc.document.file_name if doc.document else doc.video.file_name
         encoded_name = quote_plus(file_name)
+        msg_id = doc.id
 
         stream = f"{URL}watch/{msg_id}/{encoded_name}?hash={get_hash(doc)}"
         download = f"{URL}{msg_id}/{encoded_name}?hash={get_hash(doc)}"
