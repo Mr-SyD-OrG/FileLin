@@ -72,12 +72,17 @@ async def start(client, message):
     if AUTH_CHANNEL:
         try:
             # Fetch subscription statuses once
-            is_req_sub = await is_req_subscribed(client, message)
+            is_req_sub = await is_req_subscribed(client, message, AUTH_CHANNEL)
             is_sub = await is_subscribed(client, message)
-
-            if not (is_req_sub and is_sub):
+            is_reqq_sub = await is_req_subscribed(client, message, SYD_CHANNEL)
+            if not (is_req_sub and is_sub and is_reqq_sub):
                 try:
                     invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
+                except ChatAdminRequired:
+                    logger.error("Make sure Bot is admin in Forcesub channel")
+                    return
+                try:
+                    invite_link2 = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
                 except ChatAdminRequired:
                     logger.error("Make sure Bot is admin in Forcesub channel")
                     return
@@ -87,9 +92,10 @@ async def start(client, message):
                 # Only add buttons if the user is not subscribed
                 if not is_req_sub:
                     btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ¹⊛", url=invite_link.invite_link)])
-
                 if not is_sub:
                     btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ²⊛", url="https://t.me/Bot_Cracker")])
+                if not is_reqq_sub:
+                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ³⊛", url=invite_link2.invite_link)])
 
                 if len(message.command) > 1 and message.command[1] != "subscribe":
                     try:
