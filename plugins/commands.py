@@ -264,11 +264,11 @@ async def check_subscription_callback(client, query):
 
 
 
-@Client.on_chat_join_request(filters.chat(AUTH_CHANNEL))
+@Client.on_chat_join_request(filters.chat([AUTH_CHANNEL, SYD_CHANNEL]))
 async def join_reqs(client, message: ChatJoinRequest):
   user_id = message.from_user.id
-  if not await db.find_join_req(user_id):
-    await db.add_join_req(user_id)
+  if not await db.find_join_req(user_id, message.chat.id):
+    await db.add_join_req(user_id, message.chat.id)
     file_id = await db.get_stored_file_id(user_id)
     if not file_id:
         try:
