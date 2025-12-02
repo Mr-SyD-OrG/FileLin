@@ -68,7 +68,7 @@ def decode_file_name(encoded: str) -> str:
     return zlib.decompress(compressed).decode()
 
 
-async def is_subscribed(bot, query=None, userid=None):
+async def is_subsribed(bot, query=None, userid=None):
     try:
         if userid == None and query != None:
             user = await bot.get_chat_member(SYD_CHANNEL, query.from_user.id)
@@ -84,11 +84,28 @@ async def is_subscribed(bot, query=None, userid=None):
 
     return False
     
-async def is_req_subscribed(bot, query, MRSYD):
-    if await db.find_join_req(query.from_user.id, MRSYD):
+async def is_subscribed(bot, query=None, userid=None):
+    try:
+        if userid == None and query != None:
+            user = await bot.get_chat_member(FSUB_UNAME, query.from_user.id)
+        else:
+            user = await bot.get_chat_member(FSUB_UNAME, int(userid))
+    except UserNotParticipant:
+        pass
+    except Exception as e:
+        logger.exception(e)
+    else:
+        if user.status != enums.ChatMemberStatus.BANNED:
+            return True
+
+    return False
+
+
+async def is_req_subscribed(bot, query, syd=AUTH_CHANNEL):
+    if await bd.find_join_req(query.from_user.id, syd):
         return True
     try:
-        user = await bot.get_chat_member(MRSYD, query.from_user.id)
+        user = await bot.get_chat_member(syd, query.from_user.id)
     except UserNotParticipant:
         pass
     except Exception as e:
