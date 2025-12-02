@@ -44,11 +44,25 @@ class Database:
         self.syd = self.db.bots
         self.all = self.db.file
         
-    async def find_join_req(self, user_id, chat_id):
-        return bool(await self.req.find_one({'user_id': user_id, 'chat_id': chat_id}))
-    async def add_join_req(self, user_id, chat_id):
-        await self.req.insert_one({'user_id': user_id, 'chat_id': chat_id})
-    async def del_join_req(self):
+    async def find_join_req(self, user_id: int, channel_id: int):
+        doc = await self.req.find_one({'user_id': user_id, 'channel_id': channel_id})
+        return bool(doc)
+
+    async def add_join_req(self, user_id: int, channel_id: int):
+        await self.req.update_one(
+            {'user_id': user_id, 'channel_id': channel_id},
+            {'$set': {'user_id': user_id, 'channel_id': channel_id}},
+            upsert=True
+        )
+
+    async def del_join_req(self, user_id: int, channel_id: int):
+        await self.req.delete_one({'user_id': user_id, 'channel_id': channel_id})
+
+    async def delete_channel_users(self, channel_id: int):
+        result = await self.req.delete_many({"channel_id": channel_id})
+        return result.deleted_count
+        
+    async def del_all_join_req(self):
         await self.req.drop()
         
     def new_user(self, id, name):
