@@ -273,7 +273,54 @@ async def check_subscription_callback(client, query):
     except Exception as e:
         await query.message.edit_text(f"⚠️ Failed to generate link\n\n{e}")
 
+@Client.on_callback_query(filters.regex("^jrq:") & filters.user(ADMINS))
+async def jreq_callback(client, cq):
+    action = cq.data.split(":")[1]
 
+    if action == "del_auth":
+        result = await db.delete_channel_users(AUTH_CHANNEL)
+        await cq.answer("Deleted!")
+        await cq.message.reply(f"🗑️ Deleted **{result.deleted_count}** users from AUTH_CHANNEL.")
+        return await cq.answer("Deleted!")
+
+    if action == "del_syd":
+        result = await db.delete_channel_users(SYD_CHANNEL)
+        await cq.answer("Deleted!")
+        await cq.message.reply(f"🗑️ Deleted **{result.deleted_count}** users from SYD_CHANNEL.")
+        return await cq.answer("Deleted!")
+
+    if action == "del_all":
+        await db.delete_all_join_req()
+        await cq.answer("Cleared!")
+        await cq.message.reply("🗑️ All join requests deleted.")
+        return 
+
+    if action == "count":
+        auth_count = await db.req.count_documents({"channel_id": AUTH_CHANNEL})
+        syd_count = await db.req.count_documents({"channel_id": SYD_CHANNEL})
+        total = await db.req.count_documents({})
+
+        await cq.message.reply(
+            f"📊 **Join Request Count:**\n"
+            f"• AUTH_CHANNEL: `{auth_count}`\n"
+            f"• SYD_CHANNEL : `{syd_count}`\n"
+            f"• Total       : `{total}`"
+        )
+        return await cq.answer("Loaded!")
+
+@Client.on_message(filters.command("jreq") & filters.user(ADMINS))
+async def jreq_menu(client, message):
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🗑️ Delete AUTH Channel", callback_data="jrq:del_auth")],
+        [InlineKeyboardButton("🗑️ Delete SYD Channel", callback_data="jrq:del_syd")],
+        [InlineKeyboardButton("🗑️ Delete ALL", callback_data="jrq:del_all")],
+        [InlineKeyboardButton("📊 View Count", callback_data="jrq:count")],
+    ])
+
+    await message.reply(
+        "**📂 Join-Request Manager**\nSelect an option:",
+        reply_markup=keyboard
+    )
 
 @Client.on_chat_join_request(filters.chat([AUTH_CHANNEL, SYD_CHANNEL]))
 async def join_reqs(client, message: ChatJoinRequest):
