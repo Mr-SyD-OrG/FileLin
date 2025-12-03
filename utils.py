@@ -102,7 +102,7 @@ async def is_subscribed(bot, query=None, userid=None):
 
 
 async def is_req_subscribed(bot, query, syd=AUTH_CHANNEL):
-    if await bd.find_join_req(query.from_user.id, syd):
+    if await db.find_join_req(query.from_user.id, syd):
         return True
     try:
         user = await bot.get_chat_member(syd, query.from_user.id)
