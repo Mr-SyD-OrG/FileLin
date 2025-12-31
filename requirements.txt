@@ -12,7 +12,7 @@
  pytz 
  aiohttp==3.8.3
  googletrans==3.1.0a0
- pyrofork
+ pyrofork==2.3.43
 #---master---# 
  #Telethroid==0.0.10 
  PyLeaves==1.0.2 
@@ -42,7 +42,6 @@
  jinja2
  apscheduler
  pyshorteners
- pyromod==1.5
  colorama
 
 
