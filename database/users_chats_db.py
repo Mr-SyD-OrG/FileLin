@@ -360,16 +360,14 @@ class Database:
     async def remove_stored_file_id(self, user_id: int):
         await self.all.delete_one({"_id": user_id})
 
-    async def store_file_id_if_not_subscribed(self, user_id: int, file_id: str):
-        exists = await self.all.find_one({"_id": user_id})
-        if not exists:
-            await self.all.insert_one({"_id": user_id, "file_id": file_id})
-
-    async def get_stored_file_id(self, user_id: int) -> str | None:
-        data = await self.all.find_one({"_id": user_id})
-        if data:
-                return data.get("file_id")
-        return None
+    async def store_file_id_if_not_subscribed(self, user_id: int, file_id: int, mess: int):
+        await self.all.update_one(
+            {"_id": user_id},
+            {"$set": {"file_id": file_id, "mess": mess}},
+            upsert=True
+        )
+    async def get_stored_file_id(self, user_id: int) -> dict | None:
+        return await self.all.find_one({"_id": user_id})
 
     async def give_free_trial(self, user_id):
         #await set_free_trial_status(user_id)
