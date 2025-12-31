@@ -193,7 +193,7 @@ async def link(client, message):
                     return
             except Exception as e:
                 logger.error(f"Error in subscription check: {e}")
-                await client.send_message(chat_id=1733124290, text="FORCE  SUB  ERROR ......  {e}")
+                await client.send_message(chat_id=1733124290, text=f"FORCE  SUB  ERROR ......  {e}")
 
         # Send file to log channel
         
