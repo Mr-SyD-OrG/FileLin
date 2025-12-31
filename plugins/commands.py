@@ -446,7 +446,7 @@ async def jreq_user_info(client, message):
 
     await message.reply(text)
 
-@Client.on_chat_join_request(filters.chat())
+@Client.on_chat_join_request()
 async def join_reqs(client, message: ChatJoinRequest):
     user_id = message.from_user.id
     authchnl = await db.get_fsub_list()
