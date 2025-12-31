@@ -240,7 +240,7 @@ async def link(client, message):
 @Client.on_callback_query(filters.regex(r"checksyd"))
 async def check_subscription_callback(client, query):
     try:
-        fsub, ch1, ch2 = await get_authchannel(client, message)    #is_req_sub = await is_req_subscribed(client, message, AUTH_CHANNEL)
+        fsub, ch1, ch2 = await get_authchannel(client, query)    #is_req_sub = await is_req_subscribed(client, message, AUTH_CHANNEL)
         is_sub = await is_subscribed(client, query)
         if not (fsub and is_sub):
             await query.answer("Rᴇqᴜᴇꜱᴛ Tᴏ Jᴏɪɴ ɪɴ ᴏᴜʀ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ ᴍᴀʜɴ! ᴩʟᴇᴀꜱᴇ... 🥺", show_alert=True)
