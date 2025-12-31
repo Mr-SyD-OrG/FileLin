@@ -458,8 +458,8 @@ async def jreq_user_info(client, message):
 
 @Client.on_chat_join_request(filters.chat())
 async def join_reqs(client, message: ChatJoinRequest):
-  user_id = message.from_user.id
-  authchnl = await db.get_fsub_list()
+    user_id = message.from_user.id
+    authchnl = await db.get_fsub_list()
     if message.chat.id not in authchnl:
         return
     try:
