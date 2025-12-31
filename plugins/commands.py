@@ -515,6 +515,10 @@ async def join_reqs(client, message: ChatJoinRequest):
             disable_web_page_preview=True
         )
         await db.remove_stored_file_id(user_id)
+        try: 
+            await syd.delete()
+        except:
+            pass
     
 
 @Client.on_message(filters.command("delreq") & filters.private & filters.user(ADMINS))
