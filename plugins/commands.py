@@ -13,7 +13,7 @@ from urllib.parse import quote_plus
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id, get_bad_files
 from database.users_chats_db import db, delete_all_referal_users, get_referal_users_count, get_referal_all_users, referal_add_user
 from info import CHANNELS, ADMINS, FSUB_UNAME, AUTH_CHANNEL, SYD_CHANNEL, URL, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, CHNL_LNK, GRP_LNK, REQST_CHANNEL, SUPPORT_CHAT_ID, SUPPORT_CHAT, MAX_B_TN, VERIFY, HOWTOVERIFY, SHORTLINK_API, SHORTLINK_URL, TUTORIAL, IS_TUTORIAL, PREMIUM_USER, PICS, SUBSCRIPTION, REFERAL_PREMEIUM_TIME, REFERAL_COUNT, PREMIUM_AND_REFERAL_MODE
-from utils import get_settings, get_size, is_req_subscribed, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial
+from utils import get_settings, get_size, is_req_subscribed, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial, get_authchannel
 from database.connections_mdb import active_connection
 # from plugins.pm_filter import ENABLE_SHORTLINK
 import re, asyncio, os, sys
@@ -72,31 +72,35 @@ async def start(client, message):
     if AUTH_CHANNEL:
         try:
             # Fetch subscription statuses once
-            is_req_sub = await is_req_subscribed(client, message, AUTH_CHANNEL)
+            fsub, ch1, ch2 = await get_authchannel(client, message)    #is_req_sub = await is_req_subscribed(client, message, AUTH_CHANNEL)
+            #is_req_sub2 = await is_req_subscribed(client, message, SYD_CHANNEL)
             is_sub = await is_subscribed(client, message)
-            is_reqq_sub = await is_req_subscribed(client, message, SYD_CHANNEL)
-            if not (is_req_sub and is_sub and is_reqq_sub):
+
+            if not (fsub and is_sub):
                 try:
-                    invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
-                except ChatAdminRequired:
-                    logger.error("Make sure Bot is admin in Forcesub channel")
-                    return
-                try:
-                    invite_link2 = await client.create_chat_invite_link(int(AUTH_CHANNEL), creates_join_request=True)
+                    invite_link, invite_link2 = None, None
+                    if ch1:
+                        invite_link = await client.create_chat_invite_link(int(ch1), creates_join_request=True)
+                    if ch2:
+                        invite_link2 = await client.create_chat_invite_link(int(ch2), creates_join_request=True)
                 except ChatAdminRequired:
                     logger.error("Make sure Bot is admin in Forcesub channel")
                     return
                 
                 btn = []
 
-                # Only add buttons if the user is not subscribed
-                if not is_req_sub:
-                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ¹⊛", url=invite_link.invite_link)])
-                if not is_reqq_sub:
-                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ³⊛", url=invite_link2.invite_link)])
-                if not is_sub:
-                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ²⊛", url="https://t.me/Bot_Cracker")])
+                # Only invite_linkadd buttons if the user is not subscribed
                 
+                if invite_link:
+                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ¹⊛", url=invite_link.invite_link)])
+
+                if invite_link2:
+                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ²⊛", url=invite_link2.invite_link)])
+                
+                if not is_sub:
+                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ³⊛", url=f"https://t.me/{FSUB_UNAME}")])
+                    
+                    
                 if len(message.command) > 1 and message.command[1] != "subscribe":
                     try:
                         kk, file_id = message.command[1].split("_", 1)
@@ -104,16 +108,17 @@ async def start(client, message):
                     except (IndexError, ValueError):
                         btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
 
-                await client.send_message(
+                sydback = await client.send_message(
                     chat_id=message.from_user.id,
-                    text="Jᴏɪɴ Oᴜʀ Uᴘᴅᴀᴛᴇꜱ Cʜᴀɴɴᴇʟ ᴀɴᴅ Tʜᴇɴ Cʟɪᴄᴋ Oɴ ᴛʀʏ ᴀɢᴀɪɴ ᴛᴏ ɢᴇᴛ ʏᴏᴜʀ ʀᴇǫᴜᴇꜱᴛᴇᴅ ꜰɪʟᴇ.",
+                    text="<b>Jᴏɪɴ Oᴜʀ Uᴘᴅᴀᴛᴇꜱ Cʜᴀɴɴᴇʟ</b> Aɴᴅ Tʜᴇɴ Cʟɪᴄᴋ Oɴ Tʀʏ Aɢᴀɪɴ Tᴏ Gᴇᴛ Yᴏᴜʀ Rᴇǫᴜᴇꜱᴛᴇᴅ Fɪʟᴇ.",
                     reply_markup=InlineKeyboardMarkup(btn),
-                    parse_mode=enums.ParseMode.MARKDOWN
+                    parse_mode=enums.ParseMode.HTML
                 )
+                await db.store_file_id_if_not_subscribed(message.from_user.id, file_id, sydback.id)
                 return
         except Exception as e:
             logger.error(f"Error in subscription check: {e}")
-            await client.send_message(chat_id=1733124290, text="FORCE  SUB  ERROR ......  CHECK LOGS")
+            await client.send_message(chat_id=1733124290, text=f"FORCE  SUB  ERROR ......  CHECK LOGS {e}")
 
         
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
