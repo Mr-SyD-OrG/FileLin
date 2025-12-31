@@ -28,6 +28,9 @@ SPELL_IMG = environ.get("SPELL_IMG", "https://telegra.ph/file/86b7b7e2aa7e38f328
 SUBSCRIPTION = (environ.get('SUBSCRIPTION', 'https://graph.org/file/64afb8fff79e1b3d1706Fa'))
 CODE = (environ.get('CODE', 'https://graph.org/file/64afb8fff79e1b3d17066.jpg'))
 FSUB_UNAME = "Mod_Moviez_X"
+COUNT_LIMIT = 8
+DAYS_LIMIT = 4  
+
 
 from pyrogram import utils as pyroutils
 pyroutils.MIN_CHAT_ID = -999999999999
