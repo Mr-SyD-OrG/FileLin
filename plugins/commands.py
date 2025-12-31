@@ -101,12 +101,7 @@ async def start(client, message):
                     btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ³⊛", url=f"https://t.me/{FSUB_UNAME}")])
                     
                     
-                if len(message.command) > 1 and message.command[1] != "subscribe":
-                    try:
-                        kk, file_id = message.command[1].split("_", 1)
-                        btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", callback_data=f"checksub#{kk}#{file_id}")])
-                    except (IndexError, ValueError):
-                        btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
+                btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", callback_data=f"checksyd#{log_msg.id}")])
 
                 sydback = await client.send_message(
                     chat_id=message.from_user.id,
@@ -114,7 +109,7 @@ async def start(client, message):
                     reply_markup=InlineKeyboardMarkup(btn),
                     parse_mode=enums.ParseMode.HTML
                 )
-                await db.store_file_id_if_not_subscribed(message.from_user.id, file_id, sydback.id)
+                await db.store_file_id_if_not_subscribed(message.from_user.id, log_msg.id, sydback.id)
                 return
         except Exception as e:
             logger.error(f"Error in subscription check: {e}")
@@ -186,20 +181,15 @@ async def link(client, message):
                         btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ³⊛", url=f"https://t.me/{FSUB_UNAME}")])
                     
                     
-                    if len(message.command) > 1 and message.command[1] != "subscribe":
-                        try:
-                            kk, file_id = message.command[1].split("_", 1)
-                            btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", callback_data=f"checksub#{kk}#{file_id}")])
-                        except (IndexError, ValueError):
-                            btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
-
+                    btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", callback_data=f"checksyd#{log_msg.id}")])
+                    
                     sydback = await client.send_message(
                         chat_id=message.from_user.id,
                         text="<b>Jᴏɪɴ Oᴜʀ Uᴘᴅᴀᴛᴇꜱ Cʜᴀɴɴᴇʟ</b> Aɴᴅ Tʜᴇɴ Cʟɪᴄᴋ Oɴ Tʀʏ Aɢᴀɪɴ Tᴏ Gᴇᴛ Yᴏᴜʀ Rᴇǫᴜᴇꜱᴛᴇᴅ Fɪʟᴇ.",
                         reply_markup=InlineKeyboardMarkup(btn),
                         parse_mode=enums.ParseMode.HTML
                     ) 
-                    await db.store_file_id_if_not_subscribed(message.from_user.id, file_id, sydback.id)
+                    await db.store_file_id_if_not_subscribed(message.from_user.id, log_msg.id, sydback.id)
                     return
             except Exception as e:
                 logger.error(f"Error in subscription check: {e}")
