@@ -43,8 +43,8 @@ class Database:
         self.req = self.db.requests
         self.syd = self.db.bots
         self.all = self.db.file
+        self.fsub_col = self.db.fsub_col
         
-    async def find_join_req(self, user_id: int, channel_id: int):
     async def find_join_req(self, user_id: int, channel_id: int):
         doc = await self.req.find_one({'user_id': user_id, 'channel_id': channel_id})
         return bool(doc)
